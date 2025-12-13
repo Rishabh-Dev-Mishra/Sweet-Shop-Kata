@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import API_URL from '../config';
 
 function Login() {
     const [username, setUsername] = useState('');
@@ -10,7 +11,7 @@ function Login() {
     const handleLogin = async (e) => {
         e.preventDefault();
         try {
-            const res = await fetch('http://localhost:5000/api/auth/login', {
+            const res = await fetch('${API_URL}/auth/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, password })
@@ -19,7 +20,7 @@ function Login() {
 
             if (res.ok) {
                 localStorage.setItem('auth-token', data.token);
-                alert('Login Successful!');
+                localStorage.setItem('user-role', data.role); 
                 navigate('/');
             } else {
                 setError(data.message);
@@ -30,17 +31,12 @@ function Login() {
     };
 
     return (
-        // Flexbox centering for the whole page
         <div className="flex items-center justify-center min-h-screen bg-gray-100">
-            {/* The Card */}
             <div className="bg-white p-8 rounded-lg shadow-md w-96">
-
-                {/* HERE IS YOUR RED LOGIN HEADER */}
                 <h2 className="text-2xl font-bold mb-6 text-center text-red-600">
                     Login
                 </h2>
 
-                {/* Error Message */}
                 {error && (
                     <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded mb-4">
                         {error}
