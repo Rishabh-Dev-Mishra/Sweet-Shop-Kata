@@ -2,6 +2,6 @@ const isLocal = window.location.hostname === "localhost" || window.location.host
 
 const API_URL = isLocal
     ? "http://localhost:5000/api"
-    : "https://sweet-shop-cvab.onrender.com";
+    : "https://sweet-shop-cvab.onrender.com/api";
 
 export default API_URL;
