@@ -60,8 +60,12 @@ router.post('/login', async (req, res) => {
             { expiresIn: '1h' }
         );
 
-        res.header('auth-token', token).json({ token: token });
-
+        // OLD: res.header('auth-token', token).json({ token: token });
+        // NEW:
+        res.header('auth-token', token).json({
+            token: token,
+            role: user.role  // <--- Send the role to the frontend
+        });
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
