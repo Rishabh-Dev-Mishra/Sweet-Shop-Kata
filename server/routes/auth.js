@@ -4,6 +4,8 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const router = express.Router();
 
+require('dotenv').config();
+
 // REGISTER ROUTE
 router.post('/register', async (req, res) => {
     try {
@@ -54,7 +56,7 @@ router.post('/login', async (req, res) => {
         // 'SecretKey' should be in a .env file in real production, but for this Kata we keep it simple.
         const token = jwt.sign(
             { _id: user._id, role: user.role },
-            'MySuperSecretKey',
+            process.env.TOKEN_SECRET,
             { expiresIn: '1h' }
         );
 

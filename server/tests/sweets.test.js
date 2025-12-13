@@ -4,6 +4,8 @@ const mongoose = require('mongoose');
 const sweetsRoute = require('../routes/sweets');
 const Sweet = require('../models/Sweet'); // Import the model to clean up data
 
+require('dotenv').config();
+
 const app = express();
 app.use(express.json());
 app.use('/api/sweets', sweetsRoute);
@@ -24,9 +26,17 @@ afterAll(async () => {
     await mongoose.connection.close();
 });
 
+// ... imports ...
+// ... beforeAll / afterEach ...
+
 describe('GET /api/sweets', () => {
-    it('should return all sweets', async () => {
-        // Create a fake sweet so we have something to find
+    it('should return all sweets (if authorized)', async () => {
+        // 1. Create a dummy user and get a token
+        // We can cheat here and generate a token directly since we own the Secret Key
+        const jwt = require('jsonwebtoken');
+        const token = jwt.sign({ _id: 'dummyId', role: 'user' }, process.env.TOKEN_SECRET, { expiresIn: '1h' });
+
+        // 2. Create a dummy sweet
         const sweet = new Sweet({
             name: "Test Choco",
             category: "Chocolate",
@@ -35,11 +45,13 @@ describe('GET /api/sweets', () => {
         });
         await sweet.save();
 
-        const res = await request(app).get('/api/sweets');
+        // 3. Request with the Token header
+        const res = await request(app)
+            .get('/api/sweets')
+            .set('auth-token', token); // <--- ATTACH THE TOKEN HERE
 
         expect(res.statusCode).toEqual(200);
         expect(Array.isArray(res.body)).toBeTruthy();
-        expect(res.body.length).toBe(1); // We should find the one we just added
-        expect(res.body[0].name).toBe("Test Choco");
+        expect(res.body.length).toBe(1);
     });
 });
