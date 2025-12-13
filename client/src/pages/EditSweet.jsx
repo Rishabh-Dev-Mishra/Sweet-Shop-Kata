@@ -16,7 +16,7 @@ function EditSweet() {
     useEffect(() => {
         const fetchSweet = async () => {
             const token = localStorage.getItem('auth-token');
-            const res = await fetch('${API_URL}/sweets', {
+            const res = await fetch(`${API_URL}/sweets`, {
                 headers: { 'auth-token': token }
             });
             const data = await res.json();

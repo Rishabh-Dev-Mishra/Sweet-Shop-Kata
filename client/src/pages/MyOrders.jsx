@@ -10,7 +10,7 @@ function MyOrders() {
             const token = localStorage.getItem('auth-token');
             if (!token) return navigate('/login');
 
-            const res = await fetch('${API_URL}/sweets/my/orders', {
+            const res = await fetch(`${API_URL}/sweets/my/orders`, {
                 headers: { 'auth-token': token }
             });
             const data = await res.json();

@@ -14,7 +14,7 @@ function AddSweet() {
         const token = localStorage.getItem('auth-token');
 
         try {
-            const res = await fetch('${API_URL}/sweets', {
+            const res = await fetch(`${API_URL}/sweets`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

@@ -18,7 +18,7 @@ function Home() {
             }
 
             try {
-                const res = await fetch('${API_URL}/sweets', {
+                const res = await fetch(`${API_URL}/sweets`, {
                     headers: { 'auth-token': token }
                 });
                 if (res.status === 401) {
