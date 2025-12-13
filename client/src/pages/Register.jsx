@@ -1,26 +1,26 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 
-function Login() {
+function Register() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const navigate = useNavigate();
 
-    const handleLogin = async (e) => {
+    const handleRegister = async (e) => {
         e.preventDefault();
         try {
-            const res = await fetch('http://localhost:5000/api/auth/login', {
+            const res = await fetch('http://localhost:5000/api/auth/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, password })
             });
+
             const data = await res.json();
 
             if (res.ok) {
-                localStorage.setItem('auth-token', data.token);
-                alert('Login Successful!');
-                navigate('/');
+                alert('Registration Successful! Please Login.');
+                navigate('/login'); // Send them to login page
             } else {
                 setError(data.message);
             }
@@ -30,30 +30,25 @@ function Login() {
     };
 
     return (
-        // Flexbox centering for the whole page
         <div className="flex items-center justify-center min-h-screen bg-gray-100">
-            {/* The Card */}
             <div className="bg-white p-8 rounded-lg shadow-md w-96">
-
-                {/* HERE IS YOUR RED LOGIN HEADER */}
-                <h2 className="text-2xl font-bold mb-6 text-center text-red-600">
-                    Login
+                <h2 className="text-2xl font-bold mb-6 text-center text-blue-600">
+                    Create Account
                 </h2>
 
-                {/* Error Message */}
                 {error && (
                     <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded mb-4">
                         {error}
                     </div>
                 )}
 
-                <form onSubmit={handleLogin}>
+                <form onSubmit={handleRegister}>
                     <div className="mb-4">
                         <label className="block text-gray-700 text-sm font-bold mb-2">Username</label>
                         <input
                             type="text"
                             className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            placeholder="Enter username"
+                            placeholder="Choose a username"
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
                             required
@@ -65,7 +60,7 @@ function Login() {
                         <input
                             type="password"
                             className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            placeholder="Enter password"
+                            placeholder="Choose a password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             required
@@ -76,15 +71,16 @@ function Login() {
                         type="submit"
                         className="w-full bg-blue-500 text-white font-bold py-2 px-4 rounded hover:bg-blue-600 transition duration-200"
                     >
-                        Sign In
+                        Register
                     </button>
                 </form>
+
                 <p className="mt-4 text-center text-sm text-gray-600">
-                    Don't have an account? <Link to="/register" className="text-blue-500 hover:underline">Register here</Link>
+                    Already have an account? <Link to="/login" className="text-blue-500 hover:underline">Login here</Link>
                 </p>
             </div>
         </div>
     );
 }
 
-export default Login;
+export default Register;
