@@ -39,4 +39,27 @@ router.post('/', verify, async (req, res) => {
     }
 });
 
+// PURCHASE a Sweet (Protected)
+router.post('/:id/purchase', verify, async (req, res) => {
+    try {
+        // 1. Find the sweet
+        const sweet = await Sweet.findById(req.params.id);
+        if (!sweet) return res.status(404).json({ message: "Sweet not found" });
+
+        // 2. Check stock
+        if (sweet.quantity < 1) {
+            return res.status(400).json({ message: "Out of Stock" });
+        }
+
+        // 3. Decrease quantity and save
+        sweet.quantity -= 1;
+        const updatedSweet = await sweet.save();
+
+        res.json(updatedSweet);
+
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
 module.exports = router;

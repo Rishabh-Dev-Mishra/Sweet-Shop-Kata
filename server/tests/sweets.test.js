@@ -54,4 +54,30 @@ describe('GET /api/sweets', () => {
         expect(Array.isArray(res.body)).toBeTruthy();
         expect(res.body.length).toBe(1);
     });
+
+    // ... previous tests ...
+
+    it('should purchase a sweet and decrease quantity', async () => {
+        // 1. Create a sweet with 5 items in stock
+        const sweet = new Sweet({
+            name: "KitKat",
+            category: "Chocolate",
+            price: 2,
+            quantity: 5
+        });
+        const savedSweet = await sweet.save();
+
+        // 2. Generate a fake user token (to pass security)
+        const jwt = require('jsonwebtoken');
+        const token = jwt.sign({ _id: 'dummyId', role: 'user' }, process.env.TOKEN_SECRET);
+
+        // 3. Make the Purchase Request
+        const res = await request(app)
+            .post(`/api/sweets/${savedSweet._id}/purchase`)
+            .set('auth-token', token);
+
+        // 4. Expect success and quantity to be 4
+        expect(res.statusCode).toEqual(200);
+        expect(res.body.quantity).toEqual(4);
+    });
 });
