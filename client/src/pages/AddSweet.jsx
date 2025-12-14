@@ -72,7 +72,7 @@ function AddSweet() {
 
                     <div className="flex gap-4 mb-6">
                         <div className="w-1/2">
-                            <label className="block text-gray-700 text-sm font-bold mb-2">Price ($)</label>
+                            <label className="block text-gray-700 text-sm font-bold mb-2">Price (₹)</label>
                             <input
                                 type="number"
                                 className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-400"

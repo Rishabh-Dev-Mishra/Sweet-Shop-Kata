@@ -12,10 +12,6 @@ function Home() {
     useEffect(() => {
         const fetchSweets = async () => {
             const token = localStorage.getItem('auth-token');
-            if (!token) {
-                navigate('/login');
-                return;
-            }
 
             try {
                 const res = await fetch(`${API_URL}/sweets`, {
@@ -49,8 +45,14 @@ function Home() {
 
     const handlePurchase = async (id) => {
         const token = localStorage.getItem('auth-token');
+        if (!token) {
+            alert("Please login to purchase!");
+            navigate('/login');
+            return;
+        }
+
         try {
-            const res = await fetch(`http://localhost:5000/api/sweets/${id}/purchase`, {
+            const res = await fetch(`${API_URL}/sweets/${id}/purchase`, {
                 method: 'POST',
                 headers: {
                     'auth-token': token,
@@ -62,6 +64,7 @@ function Home() {
                 setSweets(sweets.map(sweet =>
                     sweet._id === id ? { ...sweet, quantity: data.quantity } : sweet
                 ));
+                alert("Purchase Successful! 🍬");
             } else {
                 alert(data.message);
             }
@@ -73,35 +76,64 @@ function Home() {
     const handleDelete = async (id) => {
         if (!confirm("Are you sure you want to delete this sweet?")) return;
         const token = localStorage.getItem('auth-token');
-        await fetch(`http://localhost:5000/api/sweets/${id}`, {
-            method: 'DELETE',
-            headers: { 'auth-token': token }
-        });
-        setSweets(sweets.filter(s => s._id !== id));
+
+        try {
+            await fetch(`${API_URL}/sweets/${id}`, {
+                method: 'DELETE',
+                headers: { 'auth-token': token }
+            });
+            setSweets(sweets.filter(s => s._id !== id));
+        } catch (err) {
+            alert("Failed to delete sweet");
+        }
     };
 
     const handleRestock = async (id) => {
         const token = localStorage.getItem('auth-token');
-        const res = await fetch(`http://localhost:5000/api/sweets/${id}/restock`, {
-            method: 'POST',
-            headers: { 'auth-token': token }
-        });
-        const data = await res.json();
-        setSweets(sweets.map(s => s._id === id ? { ...s, quantity: data.quantity } : s));
+        try {
+            const res = await fetch(`${API_URL}/sweets/${id}/restock`, {
+                method: 'POST',
+                headers: { 'auth-token': token }
+            });
+            const data = await res.json();
+            setSweets(sweets.map(s => s._id === id ? { ...s, quantity: data.quantity } : s));
+        } catch (err) {
+            alert("Failed to restock");
+        }
     };
 
     return (
         <div className="min-h-screen bg-gray-50">
             <nav className="bg-white shadow-sm p-4 flex justify-between items-center sticky top-0 z-10">
-                <h1 className="text-xl font-bold text-pink-600">(❁´◡`❁) Sweet Shop</h1>
+                <div className="flex items-center gap-3">
+                    <h1 className="text-xl font-bold text-pink-600">(❁´◡`❁) Sweet Shop</h1>
 
-                <div className="flex gap-4">
-                    <button
-                        onClick={() => navigate('/orders')}
-                        className="text-gray-600 hover:text-blue-500 font-medium"
-                    >
-                        My Orders
-                    </button>
+                    {userRole === 'admin' && (
+                        <span className="bg-red-100 text-red-600 text-xs font-bold px-2 py-1 rounded border border-red-200">
+                            ADMIN PANEL
+                        </span>
+                    )}
+                </div>
+
+                <div className="flex gap-4 items-center">
+                    {userRole === 'admin' && (
+                        <button
+                            onClick={() => navigate('/add')}
+                            className="bg-green-500 text-white px-4 py-2 rounded-lg font-bold hover:bg-green-600 transition-colors"
+                        >
+                            + Add Sweet
+                        </button>
+                    )}
+
+                    {/* 👇 FIXED: "My Orders" only shows if you are NOT an admin */}
+                    {userRole !== 'admin' && (
+                        <button
+                            onClick={() => navigate('/orders')}
+                            className="text-gray-600 hover:text-blue-500 font-medium"
+                        >
+                            My Orders
+                        </button>
+                    )}
 
                     <button
                         onClick={handleLogout}
@@ -110,8 +142,6 @@ function Home() {
                         Logout
                     </button>
                 </div>
-
-                
             </nav>
 
             <div className="container mx-auto p-8">
@@ -126,6 +156,7 @@ function Home() {
                 </div>
 
                 {error && <p className="text-red-500 text-center">{error}</p>}
+
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {filteredSweets.map(sweet => (
                         <div key={sweet._id} className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 border border-gray-100 flex flex-col justify-between">

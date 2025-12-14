@@ -120,4 +120,18 @@ router.get('/my/orders', verify, async (req, res) => {
     }
 });
 
+router.delete('/orders/:id', verify, async (req, res) => {
+    try {
+        const order = await Order.findById(req.params.id);
+        if (!order) return res.status(404).json({ message: "Order not found" });
+        if (order.userId !== req.user._id) {
+            return res.status(403).json({ message: "You can only delete your own orders" });
+        }
+        await Order.findByIdAndDelete(req.params.id);
+        res.json({ message: "Order deleted successfully" });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
 module.exports = router;
